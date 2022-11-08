@@ -1,44 +1,63 @@
-import '../../../domain/usecases/get_user_usecase.dart';
+import 'package:example/src/domain/entities/user.dart';
+import 'package:flutter/material.dart';
+
+import 'package:example/src/domain/usecases/get_user_usecase.dart';
 import 'package:flutter_clean_architecture/flutter_clean_architecture.dart';
 
 class HomePresenter extends Presenter {
-  Function getUserOnNext;
-  Function getUserOnComplete;
-  Function getUserOnError;
-
   final GetUserUseCase getUserUseCase;
-  HomePresenter(usersRepo) : getUserUseCase = GetUserUseCase(usersRepo);
+
+  HomeViewModel viewModel;
+
+  HomePresenter(usersRepo, this.viewModel)
+      : getUserUseCase = GetUserUseCase(usersRepo) {
+    viewModel._counter = 0;
+  }
 
   void getUser(String uid) {
-    // execute getUseruserCase
+    GenericUseCaseObserver<GetUserUseCaseResponse> observer =
+        GenericUseCaseObserver();
+
+    observer.onUseCaseComplete = () {
+      print('User retrieved');
+    };
+
+    observer.onUseCaseNext = (GetUserUseCaseResponse response) {
+      print(response.user.toString());
+      viewModel._user = response.user;
+      refreshUI();
+    };
+
+    observer.onUseCaseError = (e) {
+      print('Could not retrieve user.');
+      ScaffoldMessenger.of(getContext())
+          .showSnackBar(SnackBar(content: Text(e.message)));
+      viewModel._user = null;
+      refreshUI(); // Refreshes the UI manually
+    };
+
     getUserUseCase.execute(
-        _GetUserUseCaseObserver(this), GetUserUseCaseParams(uid));
+      observer,
+      GetUserUseCaseParams(uid),
+    );
   }
 
   @override
   void dispose() {
     getUserUseCase.dispose();
   }
+
+  void buttonPressed() {
+    viewModel._counter++;
+    refreshUI();
+  }
 }
 
-class _GetUserUseCaseObserver extends Observer<GetUserUseCaseResponse> {
-  final HomePresenter presenter;
-  _GetUserUseCaseObserver(this.presenter);
-  @override
-  void onComplete() {
-    assert(presenter.getUserOnComplete != null);
-    presenter.getUserOnComplete();
-  }
+class HomeViewModel {
+  int _counter;
+  User _user;
 
-  @override
-  void onError(e) {
-    assert(presenter.getUserOnError != null);
-    presenter.getUserOnError(e);
-  }
+  int get counter => _counter;
 
-  @override
-  void onNext(response) {
-    assert(presenter.getUserOnNext != null);
-    presenter.getUserOnNext(response.user);
-  }
+  User get user => _user;
 }

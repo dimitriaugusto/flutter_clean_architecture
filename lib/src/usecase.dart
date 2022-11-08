@@ -165,3 +165,27 @@ abstract class CompletableUseCase<Params> extends UseCase<void, Params?> {
   @override
   Future<Stream<void>> buildUseCaseStream(Params? params);
 }
+
+class GenericUseCaseObserver<T> extends Observer<T> {
+  late Function onUseCaseComplete;
+  late Function onUseCaseError;
+  late Function onUseCaseNext;
+
+  @override
+  void onComplete() {
+    assert(onUseCaseComplete != null);
+    onComplete();
+  }
+
+  @override
+  void onError(e) {
+    assert(onUseCaseError != null);
+    onUseCaseError(e);
+  }
+
+  @override
+  void onNext(T? response) {
+    assert(onUseCaseNext != null);
+    onUseCaseNext(response);
+  }
+}

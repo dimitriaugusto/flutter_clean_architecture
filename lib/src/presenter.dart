@@ -62,5 +62,8 @@
 ///
 /// ```
 abstract class Presenter {
+  late Function refreshUI;
+  late Function getContext;
+
   void dispose();
 }

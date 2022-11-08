@@ -1,7 +1,7 @@
-import './home_controller.dart';
+import 'package:example/src/app/pages/home/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_clean_architecture/flutter_clean_architecture.dart';
-import '../../../data/repositories/data_users_repository.dart';
+import 'package:example/src/data/repositories/data_users_repository.dart';
 
 class HomePage extends View {
   const HomePage({Key key, this.title}) : super(key: key);
@@ -33,7 +33,7 @@ class HomePageState extends ViewState<HomePage, HomeController> {
               ControlledWidgetBuilder<HomeController>(
                 builder: (context, controller) {
                   return Text(
-                    'Button pressed ${controller.counter} times.',
+                    'Button pressed ${controller.viewModel.counter} times.',
                   );
                 },
               ),
@@ -43,7 +43,9 @@ class HomePageState extends ViewState<HomePage, HomeController> {
               ControlledWidgetBuilder<HomeController>(
                 builder: (context, controller) {
                   return Text(
-                    controller.user == null ? '' : '${controller.user}',
+                    controller.viewModel.user == null
+                        ? ''
+                        : '${controller.viewModel.user}',
                     style: Theme.of(context).textTheme.headline4,
                   );
                 },

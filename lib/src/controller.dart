@@ -84,8 +84,16 @@ abstract class Controller
   Controller() {
     logger = Logger('$runtimeType');
     _isMounted = true;
+    portFunctionsToPresenter();
     initListeners();
   }
+
+  void portFunctionsToPresenter() {
+    getPresenter().refreshUI = () => refreshUI();
+    getPresenter().getContext = () => getContext();
+  }
+
+  Presenter getPresenter();
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
